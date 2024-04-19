@@ -17,5 +17,13 @@ export const createFedimintClient = async () => {
     .setPassword(PASSWORD)
     .setActiveFederationId(NEXT_PUBLIC_DEFAULT_FEDERATION_ID);
 
-  return clientBuilder.build();
+  const client = clientBuilder.build();
+
+  client.setActiveFederationId(NEXT_PUBLIC_DEFAULT_FEDERATION_ID, true);
+  await client.useDefaultGateway();
+
+  console.log(await client.info());
+  console.log(await client.lightning.listGateways());
+
+  return client;
 };

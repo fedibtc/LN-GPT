@@ -78,13 +78,8 @@ export async function connect(args: ConnectInput): Promise<ConnectResult> {
         where: { userID: user.id },
         create: {
           userID: user.id,
-          sigToken: v4(),
-          token: v4(),
         },
-        update: {
-          sigToken: v4(),
-          token: v4(),
-        },
+        update: {},
       });
 
       cookies().set("session", newSession.token);

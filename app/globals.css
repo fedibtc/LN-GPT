@@ -12,7 +12,10 @@
     @apply list-inside px-2;
   }
 
-  .markdown li {
+  .markdown ul li {
     @apply list-disc;
+  }
+  .markdown ol li {
+    @apply list-decimal;
   }
 }

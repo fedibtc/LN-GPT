@@ -38,7 +38,7 @@ export async function createChat(
         {
           role: "system",
           content:
-            "Create a very short title/summary for this conversation in as little words as possible:",
+            "Create a very short, vague, and brief title/summary for this conversation based on the following human input:",
         },
         {
           role: "user",

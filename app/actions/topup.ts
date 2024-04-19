@@ -40,9 +40,7 @@ export async function topup(input: z.infer<typeof depositLnInput>): Promise<
 
     const fedimint = await createFedimintClient();
 
-    await fedimint.ln.awaitInvoice({
-      operationId,
-    });
+    await fedimint.lightning.awaitInvoice(operationId);
 
     await prisma.balance.update({
       where: {
