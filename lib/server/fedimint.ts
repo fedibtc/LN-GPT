@@ -8,6 +8,8 @@ export const createFedimintClient = async () => {
 
   const client = clientBuilder.build();
 
+  await client.useDefaultGateway();
+
   const { federationIds } = await client.federationIds();
 
   if (!federationIds.includes(process.env.FEDERATION_ID)) {
