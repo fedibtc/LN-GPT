@@ -11,6 +11,6 @@ procs:
         - "<C-c>"
   prisma-studio:
     shell: bun prisma studio --browser none
-  fedimint-http-client:
+  fedimint-clientd:
     shell: cd ../fedimint-clientd && cargo run --bin fedimint-clientd
     stop: SIGTERM
