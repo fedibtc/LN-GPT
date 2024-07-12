@@ -205,16 +205,24 @@ export default function EmptyState() {
           handleCreateConversation(value);
         }}
       >
-        <ChatInput
-          value={value}
-          placeholder={
-            conversations?.length === 0
-              ? "Send a message..."
-              : "Start a conversation..."
-          }
-          onChange={(e) => setValue(e.target.value)}
-          loading={isCreatingConversation}
-        />
+        {(balance?.balance ?? 0) < 1 ? (
+          <div className="flex items-center p-md justify-center">
+            <Text className="flex gap-xs text-center">
+              Top up to start chatting
+            </Text>
+          </div>
+        ) : (
+          <ChatInput
+            value={value}
+            placeholder={
+              conversations?.length === 0
+                ? "Send a message..."
+                : "Start a conversation..."
+            }
+            onChange={(e) => setValue(e.target.value)}
+            loading={isCreatingConversation}
+          />
+        )}
       </form>
     </>
   );

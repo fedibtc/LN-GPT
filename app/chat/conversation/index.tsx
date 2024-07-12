@@ -14,7 +14,7 @@ import LoadingState from "./loading-state";
 import Message from "./message";
 
 function ConversationChat({ convo }: { convo: ConversationWithMessages }) {
-  const { refetchBalance } = useAppState();
+  const { balance, refetchBalance } = useAppState();
   const { messages, input, handleInputChange, handleSubmit } = useChat({
     initialMessages: convo.messages.map((x) => ({
       id: String(x.id),
@@ -29,28 +29,42 @@ function ConversationChat({ convo }: { convo: ConversationWithMessages }) {
     },
   });
 
+  const inputRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    scrollRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
   }, [messages]);
 
   return (
     <div className="flex flex-col grow divide-y divide-extraLightGrey">
       <div className="grow relative">
-        <div className="absolute inset-0 flex flex-col gap-md overflow-auto px-md py-sm">
+        <div
+          className="absolute inset-0 flex flex-col gap-md overflow-auto px-md py-sm"
+          ref={scrollRef}
+        >
           {messages.map((m, i) => (
             <Message message={m} key={i} />
           ))}
-          <div ref={scrollRef} />
         </div>
       </div>
       <form onSubmit={handleSubmit}>
-        <ChatInput
-          value={input}
-          onChange={handleInputChange}
-          placeholder="Send a message..."
-        />
+        {(balance?.balance ?? 0) < 1 ? (
+          <div className="flex items-center p-md justify-center">
+            <Text className="flex gap-xs text-center">
+              Top up to start chatting
+            </Text>
+          </div>
+        ) : (
+          <ChatInput
+            value={input}
+            onChange={handleInputChange}
+            placeholder="Send a message..."
+            ref={inputRef}
+          />
+        )}
       </form>
     </div>
   );

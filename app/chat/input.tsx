@@ -1,25 +1,20 @@
 import { useAppState } from "@/components/providers/app-state-provider";
 import { Icon, Text } from "@fedibtc/ui";
+import { forwardRef } from "react";
 
-export default function ChatInput({
-  onSubmit,
-  loading = false,
-  ...props
-}: {
-  onSubmit?: () => void;
-  loading?: boolean;
-} & Omit<React.InputHTMLAttributes<HTMLInputElement>, "className">) {
-  const { balance } = useAppState();
-
-  return (balance?.balance ?? 0) < 1 ? (
-    <div className="flex items-center p-md justify-center">
-      <Text className="flex gap-xs text-center">Top up to start chatting</Text>
-    </div>
-  ) : (
+const ChatInput = forwardRef<
+  HTMLInputElement,
+  {
+    onSubmit?: () => void;
+    loading?: boolean;
+  } & Omit<React.InputHTMLAttributes<HTMLInputElement>, "className">
+>(({ onSubmit, loading = false, ...props }, ref) => {
+  return (
     <div className="flex gap-md focus-within:!border-blue items-center px-md">
       <input
         className="border-none py-lg text-base w-full outline-none disabled:opacity-50"
         disabled={loading}
+        ref={ref}
         {...props}
       />
       <button
@@ -37,4 +32,8 @@ export default function ChatInput({
       </button>
     </div>
   );
-}
+});
+
+ChatInput.displayName = "ChatInput";
+
+export default ChatInput;
