@@ -1,5 +1,4 @@
-import { useAppState } from "@/components/providers/app-state-provider";
-import { Icon, Text } from "@fedibtc/ui";
+import { Icon } from "@fedibtc/ui";
 import { forwardRef } from "react";
 
 const ChatInput = forwardRef<
