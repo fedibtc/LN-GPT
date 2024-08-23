@@ -7,7 +7,6 @@ import { Conversation } from "@prisma/client";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { depositEcash } from "../actions/topup-ecash";
-import { redeemLighting } from "../actions/withdraw";
 import { createChat } from "./actions/create";
 import ChatInput from "./input";
 import { styled } from "react-tailwind-variants";
@@ -17,7 +16,6 @@ const env = process.env.NEXT_PUBLIC_ENV;
 export default function EmptyState() {
   const [value, setValue] = useState("");
   const [depositLoading, setDepositLoading] = useState(false);
-  const [withdrawLoading, setWithdrawLoading] = useState(false);
   const [isCreatingConversation, setIsCreatingConversation] = useState(false);
 
   const { balance, refetchBalance, setConversation } = useAppState();
@@ -82,48 +80,6 @@ export default function EmptyState() {
     }
   };
 
-  const handleWithdraw = async () => {
-    if (!balance?.balance) return;
-
-    setWithdrawLoading(true);
-
-    try {
-      let paymentRequest: string | undefined;
-
-      try {
-        const invoice = await webln.makeInvoice({
-          minimumAmount: 1,
-          maximumAmount: balance?.balance,
-        });
-
-        paymentRequest = invoice.paymentRequest;
-      } catch {
-        /* no-op */
-      }
-
-      if (!paymentRequest) return;
-
-      const res = await redeemLighting({
-        invoice: paymentRequest,
-      });
-
-      if (!res.success) {
-        throw new Error(res.message);
-      }
-
-      toast.show({
-        content: `Successfully withdrew ${res.amount} sats`,
-        status: "success",
-      });
-
-      refetchBalance();
-    } catch (e) {
-      toast.error(e);
-    } finally {
-      setWithdrawLoading(false);
-    }
-  };
-
   useEffect(() => {
     refetchBalance();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -146,14 +102,6 @@ export default function EmptyState() {
             <div className="flex gap-sm items-center">
               <Button size="sm" onClick={handleTopup} loading={depositLoading}>
                 Topup
-              </Button>
-              <Button
-                size="sm"
-                onClick={handleWithdraw}
-                loading={withdrawLoading}
-                disabled={!balance?.balance}
-              >
-                Withdraw
               </Button>
             </div>
           </div>
