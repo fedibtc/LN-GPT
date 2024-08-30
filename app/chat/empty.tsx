@@ -2,11 +2,10 @@
 
 import { useAppState } from "@/components/providers/app-state-provider";
 import { queryGet } from "@/lib/rest";
-import { Button, Icon, Text, useFediInjection, useToast } from "@fedibtc/ui";
+import { Button, Icon, Text } from "@fedibtc/ui";
 import { Conversation } from "@prisma/client";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { depositEcash } from "../actions/topup-ecash";
 import { createChat } from "./actions/create";
 import ChatInput from "./input";
 import { styled } from "react-tailwind-variants";
@@ -15,13 +14,10 @@ const env = process.env.NEXT_PUBLIC_ENV;
 
 export default function EmptyState() {
   const [value, setValue] = useState("");
-  const [depositLoading, setDepositLoading] = useState(false);
   const [isCreatingConversation, setIsCreatingConversation] = useState(false);
 
-  const { balance, refetchBalance, setConversation } = useAppState();
-
-  const toast = useToast();
-  const { webln, fedi } = useFediInjection();
+  const { balance, refetchBalance, setConversation, setTopupDialog } =
+    useAppState();
 
   const handleCreateConversation = async (text: string) => {
     setIsCreatingConversation(true);
@@ -41,44 +37,6 @@ export default function EmptyState() {
     queryFn: () => queryGet<Array<Conversation>>("/chat"),
     retry: false,
   });
-
-  const handleTopup = async () => {
-    setDepositLoading(true);
-    try {
-      let ecashNotes: string | undefined;
-
-      try {
-        ecashNotes = await fedi.generateEcash?.({
-          minimumAmount: 1,
-        });
-      } catch {
-        /* no-op */
-      }
-
-      if (!ecashNotes) return;
-
-      const res = await depositEcash({
-        notes: ecashNotes,
-      });
-
-      if (!res.success) {
-        // Reclaim the ecash so the notes aren't lost
-        await fedi.receiveEcash?.(ecashNotes);
-        throw new Error(res.message);
-      }
-
-      toast.show({
-        content: `Successfully deposited ${res.amount} sats`,
-        status: "success",
-      });
-
-      refetchBalance();
-    } catch (e) {
-      toast.error(e);
-    } finally {
-      setDepositLoading(false);
-    }
-  };
 
   useEffect(() => {
     refetchBalance();
@@ -100,7 +58,7 @@ export default function EmptyState() {
           <div className="flex gap-sm justify-between items-center border-b border-extraLightGrey pb-sm">
             <Text>{balance?.balance} sats</Text>
             <div className="flex gap-sm items-center">
-              <Button size="sm" onClick={handleTopup} loading={depositLoading}>
+              <Button size="sm" onClick={() => setTopupDialog(true)}>
                 Topup
               </Button>
             </div>
@@ -142,9 +100,7 @@ export default function EmptyState() {
           </Text>
           <Text>Chats for Sats ⚡️</Text>
           <Text>Balance: {balance?.balance} sats</Text>
-          <Button onClick={handleTopup} loading={depositLoading}>
-            Topup
-          </Button>
+          <Button onClick={() => setTopupDialog(true)}>Topup</Button>
         </div>
       )}
       <form

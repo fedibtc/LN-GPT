@@ -30,12 +30,9 @@ interface AuthContextUser extends AuthContextType {
   user: User;
 }
 
-export type AuthContextValue =
-  | AuthContextLoading
-  | AuthContextError
-  | AuthContextUser;
+type AuthContextValue = AuthContextLoading | AuthContextError | AuthContextUser;
 
-export const AuthContext = createContext<AuthContextValue | null>(null);
+const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
