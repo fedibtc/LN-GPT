@@ -12,7 +12,7 @@
     "format:check": "prettier --ignore-path .gitignore --check \"**/*.{js,ts,tsx}\""
   },
   "dependencies": {
-    "@fedibtc/tailwind-theme": "1.0.3",
+    "@fedibtc/tailwind-theme": "^1.0.5",
     "@fedibtc/ui": "^1.2.4",
     "@nostr-dev-kit/ndk": "^2.3.2",
     "@prisma/client": "5.11.0",
