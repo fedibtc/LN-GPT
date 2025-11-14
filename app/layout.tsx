@@ -38,7 +38,7 @@ export default function RootLayout({
         <ToastProvider>
           <FediInjectionProvider
             fediModName="AI Assistant"
-            minSupportedAPIVersion={2}
+            minSupportedAPIVersion={1}
             supportedBitcoinNetworks={{
               signet: env !== "production",
               bitcoin: env === "production",
