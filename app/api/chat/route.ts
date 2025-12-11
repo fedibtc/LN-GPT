@@ -47,7 +47,7 @@ export async function POST(req: Request) {
 
     let tokens = 0;
 
-    const stream = OpenAIStream(response, {
+    const stream = OpenAIStream(response as any, {
       async onFinal(completion) {
         await prisma.message.createMany({
           data: [
