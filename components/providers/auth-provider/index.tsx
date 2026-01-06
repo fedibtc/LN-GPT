@@ -1,6 +1,5 @@
 "use client";
 
-import { useFediInjectionContext } from "@fedibtc/ui";
 import { User } from "@prisma/client";
 import { Event, UnsignedEvent, getEventHash } from "nostr-tools";
 import { createContext, useContext, useEffect, useState } from "react";
@@ -39,13 +38,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [error, setError] = useState<Error | null>(null);
   const [user, setUser] = useState<User | null>(null);
 
-  const { nostr, nostrPubkey, status } = useFediInjectionContext();
-
   useEffect(() => {
     async function attemptLogin() {
       try {
-        if (!nostr) throw new Error("No nostr provider found");
+        if (!("nostr" in window) || !window.nostr)
+          throw new Error("No nostr provider found");
 
+        const nostrPubkey = await window.nostr.getPublicKey();
         const connectionRes = await connect({ pubkey: nostrPubkey });
 
         if (!connectionRes.success) throw new Error(connectionRes.message);
@@ -67,7 +66,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             id: getEventHash(evt),
           };
 
-          const signedEvent: Event = (await nostr.signEvent(event)) as Event;
+          const signedEvent: Event = (await window.nostr.signEvent(
+            event,
+          )) as Event;
 
           const loginRes = await login(signedEvent);
 
@@ -85,10 +86,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     }
 
-    if (nostr && status === "success") {
-      attemptLogin();
-    }
-  }, [nostr, nostrPubkey, status]);
+    attemptLogin();
+  }, []);
 
   return (
     <AuthContext.Provider

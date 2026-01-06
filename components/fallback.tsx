@@ -1,15 +1,24 @@
 "use client";
 
-import { Icon, Text, useFediInjectionContext } from "@fedibtc/ui";
+import { Icon, Text } from "@fedibtc/ui";
 import Container from "./container";
 import { useAuth } from "./providers/auth-provider";
 import { formatError } from "@/lib/errors";
+import { useEffect, useState } from "react";
 
 export default function Fallback({ children }: { children: React.ReactNode }) {
-  const { isLoading, error: injectionError } = useFediInjectionContext();
+  const [hasWeblnAndNostr, setHasWeblnAndNostr] = useState<boolean | null>(
+    null,
+  );
   const { isLoading: isAuthLoading, error: authError } = useAuth();
 
-  const error = injectionError || authError;
+  const error = hasWeblnAndNostr === null || authError;
+
+  useEffect(() => {
+    if ("webln" in window && "nostr" in window) {
+      setHasWeblnAndNostr(true);
+    }
+  }, []);
 
   if (error) {
     return (
@@ -23,7 +32,7 @@ export default function Fallback({ children }: { children: React.ReactNode }) {
     );
   }
 
-  if (isLoading || isAuthLoading) {
+  if (hasWeblnAndNostr === null || isAuthLoading) {
     return (
       <Container>
         <Icon
@@ -31,7 +40,9 @@ export default function Fallback({ children }: { children: React.ReactNode }) {
           size="lg"
           className="animate-spin text-lightGrey"
         />
-        <Text>{isLoading ? "Loading" : "Authenticating"}...</Text>
+        <Text>
+          {hasWeblnAndNostr === null ? "Loading" : "Authenticating"}...
+        </Text>
       </Container>
     );
   }
