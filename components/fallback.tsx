@@ -12,22 +12,24 @@ export default function Fallback({ children }: { children: React.ReactNode }) {
   );
   const { isLoading: isAuthLoading, error: authError } = useAuth();
 
-  const error = hasWeblnAndNostr === null || authError;
-
   useEffect(() => {
     if ("webln" in window && "nostr" in window) {
       setHasWeblnAndNostr(true);
     }
   }, []);
 
-  if (error) {
+  if (hasWeblnAndNostr === false || authError) {
     return (
       <Container className="p-2">
         <Icon icon="IconCircleX" size="lg" className="text-lightGrey" />
         <Text variant="h2" weight="bold">
           An Error Occurred
         </Text>
-        <Text className="text-center">{formatError(error)}</Text>
+        <Text className="text-center">
+          {authError
+            ? formatError(authError)
+            : "WebLN and Nostr providers not found"}
+        </Text>
       </Container>
     );
   }

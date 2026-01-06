@@ -19,6 +19,9 @@ export default function TopupDialog() {
   const handleTopup = async () => {
     if (!("webln" in window) || !window.webln) return;
 
+    if (window.webln.isEnabled === false) await window.webln.enable();
+    else await window.webln.enable();
+
     setIsIdle(false);
     setIsLoading(true);
     setPaymentPending(true);
