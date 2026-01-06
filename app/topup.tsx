@@ -2,13 +2,7 @@
 
 import { useAppState } from "@/components/providers/app-state-provider";
 import { formatError } from "@/lib/errors";
-import {
-  Button,
-  Dialog,
-  DialogStatus,
-  Input,
-  useFediInjection,
-} from "@fedibtc/ui";
+import { Button, Dialog, DialogStatus, Input } from "@fedibtc/ui";
 import { useEffect, useState } from "react";
 import { createLnInvoice } from "./actions/create-ln-invoice";
 import { topup } from "./actions/topup";
@@ -22,9 +16,12 @@ export default function TopupDialog() {
   const [error, setError] = useState<string | null>(null);
   const [isIdle, setIsIdle] = useState(true);
 
-  const { webln } = useFediInjection();
-
   const handleTopup = async () => {
+    if (!("webln" in window) || !window.webln) return;
+
+    if (window.webln.isEnabled === false) await window.webln.enable();
+    else await window.webln.enable();
+
     setIsIdle(false);
     setIsLoading(true);
     setPaymentPending(true);
@@ -35,7 +32,7 @@ export default function TopupDialog() {
 
       if (!prRes.success) throw new Error(prRes.message);
 
-      await webln.sendPayment(prRes.data.invoice);
+      await window.webln.sendPayment(prRes.data.invoice);
 
       setPaymentPending(false);
 
